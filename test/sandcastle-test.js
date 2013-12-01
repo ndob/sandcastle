@@ -4,7 +4,7 @@ var equal = require('assert').equal,
   Pool = require('../lib').Pool
 
 exports.tests = {
-  'on("exit") is fired when a sandboxed script calls the exit method': function(finished, prefix) {
+ 'on("exit") is fired when a sandboxed script calls the exit method': function(finished, prefix) {
     var sandcastle = new SandCastle();
 
     var script = sandcastle.createScript("\
@@ -235,4 +235,30 @@ exports.tests = {
     });
     script.run();
   },
+  'enforce memory limit, when running scripts': function(finished, prefix) {    
+    var sandcastle = new SandCastle({memoryLimitMB: 10});
+
+    var script = sandcastle.createScript("\
+        exports.main = function() {\n\
+          var test = []; \
+          for(var i = 0; i < 5000000; ++i) { \
+            test[i] = 'a'; \
+          } \
+          exit(1); \
+        }\n\
+      "
+    );
+
+    script.on('exit', function(err, result) {
+      // Should not go here.
+      equal(false, true, prefix);
+    });
+
+    script.on('timeout', function(err, result) {
+      sandcastle.kill();
+      finished();
+    });
+    script.run();
+  },
+
 }
