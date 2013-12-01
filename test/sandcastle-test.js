@@ -4,7 +4,7 @@ var equal = require('assert').equal,
   Pool = require('../lib').Pool
 
 exports.tests = {
- 'on("exit") is fired when a sandboxed script calls the exit method': function(finished, prefix) {
+  'on("exit") is fired when a sandboxed script calls the exit method': function(finished, prefix) {
     var sandcastle = new SandCastle();
 
     var script = sandcastle.createScript("\
